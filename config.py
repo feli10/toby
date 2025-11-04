@@ -1,0 +1,19 @@
+# Motor pins
+MOTOR_A_IN1 = 17
+MOTOR_A_IN2 = 27
+MOTOR_A_EN = 12
+
+MOTOR_B_IN1 = 22
+MOTOR_B_IN2 = 16
+MOTOR_B_EN = 13
+
+# Ultrasonic sensor pins
+SENSOR_RED_TRIG = 23
+SENSOR_RED_ECHO = 24
+
+SENSOR_BLUE_TRIG = 5
+SENSOR_BLUE_ECHO = 6
+
+# Control parameters
+SAFE_DISTANCE_CM = 20
+PWM_FREQ = 1000

@@ -58,9 +58,10 @@ try:
         motor_b(-s)
         time.sleep(0.3)
 
+    # reset the motors
     time.sleep(1)
-    motor_a(0) #CHANGE THIS
-    motor_b(0) #CHANGE THIS
+    motor_a(0) 
+    motor_b(0)
 
 finally:
     pwm_a.stop()

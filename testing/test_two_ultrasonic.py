@@ -53,7 +53,7 @@ try:
             print("Sensor 1: No reading")
 
         # Wait half a second before firing the next
-        time.sleep(0.5)
+        time.sleep(1)
 
         # Sensor 2 fires
         dist2 = get_distance(TRIG2, ECHO2)
@@ -65,7 +65,7 @@ try:
         print("------------------------")
 
         # Wait another half second before restarting loop
-        time.sleep(0.5)
+        time.sleep(1)
 
 except KeyboardInterrupt:
     print("Measurement stopped by user")
