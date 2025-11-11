@@ -1,3 +1,7 @@
+# Button pin
+BUTTON_PIN = 4                      
+SCRIPT_PATH = "main.py"
+
 # Motor pins
 MOTOR_A_IN1 = 17
 MOTOR_A_IN2 = 27
@@ -13,6 +17,10 @@ SENSOR_RED_ECHO = 24
 
 SENSOR_BLUE_TRIG = 5
 SENSOR_BLUE_ECHO = 6
+
+# Movement parameters
+DRIVE_SPEED = 40
+TURN_SPEED = 20
 
 # Control parameters
 PWM_FREQ = 1000
