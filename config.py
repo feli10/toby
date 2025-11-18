@@ -20,7 +20,7 @@ SENSOR_BLUE_ECHO = 6
 
 # Movement parameters
 DRIVE_SPEED = 40
-TURN_SPEED = 20
+TURN_SPEED = 40
 
 # Control parameters
 PWM_FREQ = 1000
