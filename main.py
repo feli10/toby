@@ -9,6 +9,7 @@ from sensors import UltrasonicSensor
 
 class Toby:
     def __init__(self):
+        GPIO.setmode(GPIO.BCM)
         self.motor = MotorDriver()
         self.sensor_red = UltrasonicSensor(config.SENSOR_RED_TRIG, config.SENSOR_RED_ECHO, "Sensor Red (Front)")
         self.sensor_blue = UltrasonicSensor(config.SENSOR_BLUE_TRIG, config.SENSOR_BLUE_ECHO, "Sensor Blue (Rear)")
@@ -16,8 +17,6 @@ class Toby:
 
         # Register signal handler
         signal.signal(signal.SIGINT, self.handle_exit)
-
-        GPIO.setmode(GPIO.BCM)
 
     def handle_exit(self, sig, frame):
         """Gracefully stop motors and cleanup GPIO"""
@@ -36,7 +35,7 @@ class Toby:
             print(f"Front_Left: {dist_front_left} cm | Front_Right: {dist_front_right} cm")
 
             # --- Simple avoidance logic ---
-            if (dist_front_left and dist_front_left < config.SAFE_FRONT_DISTANCE) or (dist_front_right and dist_front_right < config.SAFE_BACK_DISTANCE):
+            if (dist_front_left and dist_front_left < config.SAFE_FRONT_DISTANCE) and (dist_front_right and dist_front_right < config.SAFE_BACK_DISTANCE):
                 print("Stuck! Stopping...")
                 self.motor.stop_all()
                 time.sleep(0.2)
