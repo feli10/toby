@@ -26,3 +26,11 @@ TURN_SPEED = 20
 PWM_FREQ = 1000
 SAFE_FRONT_DISTANCE = 20
 SAFE_BACK_DISTANCE = 15
+
+# Arduino serial configuration
+ARDUINO_PORT = "/dev/ttyACM0"
+ARDUINO_BAUD = 9600
+
+#LCD messages
+LCD_READY_MSG = "Ready"
+LCD_DISPOSAL_MSG = "Heading to disposal!"

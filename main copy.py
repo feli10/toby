@@ -30,37 +30,37 @@ class Toby:
 
     def run(self):
         while self.running:
-            dist_front_left = self.sensor_red.get_distance()
-            dist_front_right = self.sensor_blue.get_distance()
+            dist_front = self.sensor_red.get_distance()
+            dist_back = self.sensor_blue.get_distance()
 
-            print(f"Front_Left: {dist_front_left} cm | Front_Right: {dist_front_right} cm")
+            print(f"Front: {dist_front} cm | Rear: {dist_back} cm")
 
             # --- Simple avoidance logic ---
-            if (dist_front_left and dist_front_left < config.SAFE_FRONT_DISTANCE) or (dist_front_right and dist_front_right < config.SAFE_BACK_DISTANCE):
+            if (dist_front and dist_front < config.SAFE_FRONT_DISTANCE) and (dist_back and dist_back < config.SAFE_BACK_DISTANCE):
                 print("Stuck! Stopping...")
                 self.motor.stop_all()
                 time.sleep(0.2)
 
-            elif dist_front_left and dist_front_left < config.SAFE_FRONT_DISTANCE:
-                print("Object to the left! Turning right...")
-                self.motor.set_speed('A', 0)
-                self.motor.set_speed('B', config.TURN_SPEED)
+            elif dist_front and dist_front < config.SAFE_FRONT_DISTANCE:
+                print("Object ahead! Reversing...")
+                self.motor.set_speed('A', -config.DRIVE_SPEED)
+                self.motor.set_speed('B', -config.DRIVE_SPEED)
                 time.sleep(0.6)
                 self.motor.stop_all()
                 time.sleep(0.2)
 
-            elif dist_front_right and dist_front_right < config.SAFE_BACK_DISTANCE:
-                print("Object to the right! Turning left...")
-                self.motor.set_speed('A', 0)
-                self.motor.set_speed('B', -config.TURN_SPEED)
+            elif dist_back and dist_back < config.SAFE_BACK_DISTANCE:
+                print("Object behind! Moving forward...")
+                self.motor.set_speed('A', config.DRIVE_SPEED)
+                self.motor.set_speed('B', config.DRIVE_SPEED)
                 time.sleep(0.6)
                 self.motor.stop_all()
                 time.sleep(0.2)
 
             else:
                 print("Path clear. Moving forward...")
-                self.motor.set_speed('B', 0)
                 self.motor.set_speed('A', config.DRIVE_SPEED)
+                self.motor.set_speed('B', config.DRIVE_SPEED)
 
             time.sleep(0.1)
 
