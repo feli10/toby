@@ -1,4 +1,3 @@
-# main.py
 import RPi.GPIO as GPIO
 import time
 import config
@@ -6,21 +5,29 @@ import signal
 import sys
 from motor import MotorDriver
 from sensors import UltrasonicSensor
+from control.navigation import Navigator
 
 class Toby:
+    """Main robot controller class integrating motors, sensors, and navigation."""
+    
     def __init__(self):
+        """Initialize Toby with motors, sensors, and navigation system."""
         GPIO.setmode(GPIO.BCM)
         self.motor = MotorDriver()
-        self.sensor_red = UltrasonicSensor(config.SENSOR_RED_TRIG, config.SENSOR_RED_ECHO, "Sensor Red (Front)")
-        self.sensor_blue = UltrasonicSensor(config.SENSOR_BLUE_TRIG, config.SENSOR_BLUE_ECHO, "Sensor Blue (Rear)")
+        self.sensor_red = UltrasonicSensor(config.SENSOR_RED_TRIG, config.SENSOR_RED_ECHO, "Sensor Red (Left)")
+        self.sensor_blue = UltrasonicSensor(config.SENSOR_BLUE_TRIG, config.SENSOR_BLUE_ECHO, "Sensor Blue (Right)")
+        self.navigator = Navigator(self.motor, self.sensor_red, self.sensor_blue)
+        
+        # Flag to control main loop execution
         self.running = True
 
-        # Register signal handler
+        # Register signal handler for graceful shutdown (Ctrl+C)
         signal.signal(signal.SIGINT, self.handle_exit)
 
     def handle_exit(self, sig, frame):
-        """Gracefully stop motors and cleanup GPIO"""
+        """Gracefully stop motors and cleanup GPIO."""
         print("\nStopping safely...")
+        
         self.running = False
         self.motor.stop_all()
         self.motor.cleanup()
@@ -28,42 +35,45 @@ class Toby:
         sys.exit(0)
 
     def run(self):
+        """
+        Run with simple obstacle avoidance (no destination).
+        In this mode, Toby wanders freely while avoiding obstacles.
+        """
+        print("Starting autonomous navigation mode...")
+        print("Toby will wander and avoid obstacles.")
+        
+        # Main navigation loop - runs until stopped
         while self.running:
-            dist_front_left = self.sensor_red.get_distance()
-            dist_front_right = self.sensor_blue.get_distance()
+            # Execute one navigation step (check sensors, avoid obstacles, move)
+            self.navigator.navigate_step()
+    
+    def run_with_destination(self, x, y, timeout=60):
+        """Run navigation with a specific destination."""
+        print(f"Starting navigation to destination: ({x}, {y}) cm")
+        
+        self.navigator.set_destination(x, y)
 
-            print(f"Front_Left: {dist_front_left} cm | Front_Right: {dist_front_right} cm")
-
-            # --- Simple avoidance logic ---
-            if (dist_front_left and dist_front_left < config.SAFE_FRONT_DISTANCE) and (dist_front_right and dist_front_right < config.SAFE_BACK_DISTANCE):
-                print("Stuck! Stopping...")
-                self.motor.stop_all()
-                time.sleep(0.2)
-
-            elif dist_front_left and dist_front_left < config.SAFE_FRONT_DISTANCE:
-                print("Object to the left! Turning right...")
-                self.motor.set_speed('A', 0)
-                self.motor.set_speed('B', config.TURN_SPEED)
-                time.sleep(0.6)
-                self.motor.stop_all()
-                time.sleep(0.2)
-
-            elif dist_front_right and dist_front_right < config.SAFE_BACK_DISTANCE:
-                print("Object to the right! Turning left...")
-                self.motor.set_speed('A', 0)
-                self.motor.set_speed('B', -config.TURN_SPEED)
-                time.sleep(0.6)
-                self.motor.stop_all()
-                time.sleep(0.2)
-
-            else:
-                print("Path clear. Moving forward...")
-                self.motor.set_speed('B', 0)
-                self.motor.set_speed('A', config.DRIVE_SPEED)
-
-            time.sleep(0.1)
+        success = self.navigator.navigate_to_destination(timeout)
+        
+        # Report result
+        if success:
+            print("Successfully reached destination!")
+        else:
+            print("Failed to reach destination within timeout.")
+        
+        return success
 
 
 if __name__ == "__main__":
+    # Create Toby instance
     toby = Toby()
-    toby.run()
+    
+    # Option 1: Wander mode (no destination)
+    # toby.run()
+    
+    # Option 2: Navigate to a specific destination
+    # Coordinates are relative to starting position:
+    # - x: positive = right, negative = left
+    # - y: positive = forward, negative = backward
+    # Destination is 100cm forward (y) and 50cm right (x)
+    toby.run_with_destination(50, 100, timeout=120)
